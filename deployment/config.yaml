@@ -1,0 +1,248 @@
+# GATRA Platform Configuration
+# Deployment Configuration File
+
+# Global Settings
+global:
+  environment: production
+  log_level: INFO
+  timezone: UTC
+
+# Data Collection Configuration
+data_collection:
+  api_audit_logs:
+    enabled: true
+    retention_days: 90
+    real_time: true
+    source: "elasticsearch://logs/api-audit"
+  
+  network_flow_data:
+    enabled: true
+    retention_days: 30
+    source: "netflow://collector:2055"
+    protocol: "netflow"  # or "sflow"
+  
+  database_audit_logs:
+    enabled: true
+    retention_days: 90
+    real_time: true
+    sources:
+      - "postgresql://db1/audit"
+      - "mysql://db2/audit"
+  
+  auth_logs:
+    enabled: true
+    retention_days: 90
+    real_time: true
+    sources:
+      - "syslog://auth-server:514"
+      - "ldap://ldap-server:389"
+  
+  file_system_logs:
+    enabled: true
+    retention_days: 30
+    real_time: true
+    source: "filebeat://file-servers"
+  
+  session_logs:
+    enabled: true
+    retention_days: 7
+    real_time: true
+    source: "kafka://sessions-topic"
+  
+  cloud_api_logs:
+    enabled: true
+    retention_days: 90
+    real_time: true
+    sources:
+      - "aws://cloudtrail"
+      - "azure://activity-logs"
+      - "gcp://audit-logs"
+
+# Infrastructure Configuration
+infrastructure:
+  log_aggregation:
+    type: "elasticsearch"  # or "splunk" or "cloud-native"
+    endpoint: "https://elasticsearch.example.com:9200"
+    cluster_name: "gatra-cluster"
+    indices:
+      - "gatra-api-logs"
+      - "gatra-network-logs"
+      - "gatra-auth-logs"
+  
+  streaming:
+    type: "kafka"  # or "kinesis"
+    brokers:
+      - "kafka1.example.com:9092"
+      - "kafka2.example.com:9092"
+    topics:
+      - "gatra-events"
+      - "gatra-alerts"
+  
+  storage:
+    type: "s3"  # or "gcs"
+    bucket: "gatra-data"
+    region: "us-east-1"
+    lifecycle_policy: "90-day-retention"
+  
+  compute:
+    min_cores: 16
+    min_memory_gb: 32
+    network_bandwidth_gbps: 1
+    auto_scaling:
+      enabled: true
+      min_instances: 2
+      max_instances: 10
+
+# Agent 1: Autonomous Tempo Detector
+agent1_tempo_detector:
+  enabled: true
+  tempo_threshold: 2.0  # operations per second
+  duration_threshold: 900  # 15 minutes in seconds
+  investigate_threshold: 0.70  # 70% confidence
+  isolate_threshold: 0.85  # 85% confidence
+  window_seconds: 60  # rolling window
+
+# Agent 2: Attack Phase Progression Tracker
+agent2_phase_tracker:
+  enabled: true
+  min_confidence: 0.70
+  prediction_window: 45  # minutes (30-60 minute lead time)
+  phase_weights:
+    phase1: 0.70
+    phase2: 0.88
+    phase3: 0.95
+    phase4: 0.87
+    phase5: 0.98
+    phase6: 0.89
+
+# Agent 3: Data Exfiltration Analyzer
+agent3_exfiltration_analyzer:
+  enabled: true
+  transfer_threshold_mb: 100  # MB
+  time_window_hours: 1  # hours
+  confidence_threshold: 0.98  # 98%
+  record_sizes:
+    database_credentials: 512  # bytes
+    pii: 256  # bytes
+    source_code: 10240  # 10KB
+    config_files: 2048  # 2KB
+    emails: 1024  # 1KB
+
+# Agent 4: Lateral Movement Mapper
+agent4_lateral_movement:
+  enabled: true
+  detection_threshold: 10  # systems in 30 minutes
+  time_window_minutes: 30
+  confidence_threshold: 0.87  # 87%
+  risk_scoring:
+    database_access: 100
+    admin_compromise: 100
+    high_value_system: 75
+    credential_compromise: 20
+  auto_revoke_credentials: true
+
+# Agent 5: MCP Infrastructure Detector
+agent5_mcp_detector:
+  enabled: true
+  confidence_threshold: 0.85  # 85%
+  pattern_matching:
+    tool_sequences: true
+    timing_coordination: true
+    context_persistence: true
+    tool_input_feeding: true
+  threat_intel_integration:
+    enabled: true
+    feeds:
+      - "misp://threat-intel"
+      - "otx://alienvault"
+
+# Correlation Engine
+correlation_engine:
+  enabled: true
+  confidence_precision: 0.05  # ±5%
+  threshold_settings:
+    monitor: 0.50
+    investigate: 0.70
+    prepare: 0.85
+    auto_response: 0.85
+  alert_weighting:
+    agent1: 0.35
+    agent2: 0.25
+    agent3: 0.20
+    agent4: 0.15
+    agent5: 0.05
+
+# Response Automation
+response_automation:
+  enabled: true
+  confidence_based_triggers:
+    monitor_only: 0.50  # <50%
+    investigate: 0.70  # 50-70%
+    prepare: 0.85  # 70-85%
+    auto_response: 0.85  # 85%+
+  
+  automated_actions:
+    ip_blocking: true
+    session_termination: true
+    network_isolation: true
+    system_quarantine: true
+  
+  manual_approval:
+    required_for: ["auto_response"]
+    escalation_path: ["security-team", "ciso"]
+    notification_channels:
+      - "email"
+      - "slack"
+      - "pagerduty"
+
+# Integration Configuration
+integrations:
+  soar_platform:
+    enabled: true
+    type: "splunk-soar"  # or "phantom" or "demisto"
+    endpoint: "https://soar.example.com"
+    api_key: "${SOAR_API_KEY}"
+  
+  ticketing_system:
+    enabled: true
+    type: "jira"  # or "servicenow" or "custom"
+    endpoint: "https://jira.example.com"
+    project_key: "SEC"
+  
+  notification_channels:
+    email:
+      enabled: true
+      smtp_server: "smtp.example.com"
+      from_address: "gatra-alerts@example.com"
+    slack:
+      enabled: true
+      webhook_url: "${SLACK_WEBHOOK_URL}"
+      channel: "#security-alerts"
+    pagerduty:
+      enabled: true
+      integration_key: "${PAGERDUTY_KEY}"
+
+# Monitoring & Observability
+monitoring:
+  metrics:
+    enabled: true
+    endpoint: "http://prometheus:9090"
+    scrape_interval: 15  # seconds
+  
+  logging:
+    enabled: true
+    level: "INFO"
+    destination: "elasticsearch://logs/gatra"
+  
+  alerting:
+    enabled: true
+    health_check_interval: 60  # seconds
+    alert_on_failure: true
+
+# Performance Targets
+performance_targets:
+  detection_speed_minutes: 5  # <5 minutes
+  false_positive_rate: 0.03  # <3%
+  detection_accuracy: 0.95  # 95%+
+  system_uptime: 0.999  # 99.9%
+

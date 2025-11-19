@@ -1,0 +1,73 @@
+# GATRA Platform - Git Ignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# Virtual Environment
+deployment/venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Configuration (sensitive)
+config.local.yaml
+*.key
+*.pem
+*.cert
+.env
+.env.local
+
+# Results and temporary files
+*.json.bak
+test_results.json
+deployment/data_source_verification.json
+deployment/day1-2_results.json
+
+# Deployment artifacts
+deployment/gatra/
+/opt/gatra/
+
+# Documentation build
+docs/_build/
+site/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Temporary files
+*.tmp
+*.temp
+~$*
+
+# PowerPoint (if generated)
+*.pptx.bak
+
+# Backup files
+*.bak
+*.backup
+
