@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GATRA Platform: Live Threat Simulation</title>
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #00ff41;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            overflow: hidden;
+        }
+        #header {
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        h1 { margin: 0; color: #fff; letter-spacing: 2px; }
+        .status-box {
+            border: 1px solid #333;
+            background: #111;
+            padding: 15px;
+            margin-top: 20px;
+            height: 200px;
+            overflow-y: auto;
+            font-size: 14px;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            height: 60vh;
+            margin-top: 20px;
+        }
+        .monitor {
+            border: 1px solid #444;
+            padding: 10px;
+            background: #000;
+            position: relative;
+        }
+        .agent-status {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-left: 4px solid #333;
+            background: #0f0f0f;
+            transition: all 0.3s;
+        }
+        .agent-active { border-left-color: #00ff41; background: #001a00; }
+        .agent-alert { border-left-color: #ff0000; background: #1a0000; color: #ff4444; }
+        
+        #start-btn {
+            background: #005500;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            font-family: inherit;
+        }
+        #start-btn:hover { background: #007700; }
+        
+        .progress-bar {
+            height: 4px;
+            background: #333;
+            width: 100%;
+            margin-top: 5px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #ff0000;
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        .blink { animation: blinker 1s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
+    </style>
+</head>
+<body>
+
+    <div id="header">
+        <div>
+            <h1>GATRA <span style="font-size:12px; color:#888;">AI-DRIVEN SOC PLATFORM</span></h1>
+            <div style="margin-top:5px;">TARGET: GTG-1002 CAMPAIGN | STATUS: <span id="system-status">MONITORING</span></div>
+        </div>
+        <button id="start-btn" onclick="startSimulation()">INITIATE LIVE SIMULATION</button>
+    </div>
+
+    <div class="grid-container">
+        <div class="monitor">
+            <div style="border-bottom:1px solid #333; margin-bottom:10px; font-weight:bold;">LIVE TELEMETRY FEED</div>
+            <div id="log-window" style="height: 90%; overflow-y: hidden;">
+                <div style="color:#555;">Waiting for simulation start...</div>
+            </div>
+        </div>
+
+        <div class="monitor">
+            <div style="border-bottom:1px solid #333; margin-bottom:10px; font-weight:bold;">ACTIVE AGENTS</div>
+            
+            <div id="agent1" class="agent-status">
+                <strong>AGENT 1: TEMPO DETECTOR</strong><br>
+                <small>Status: Idle</small>
+            </div>
+            
+            <div id="agent5" class="agent-status">
+                <strong>AGENT 5: INFRASTRUCTURE</strong><br>
+                <small>Status: Idle</small>
+            </div>
+            
+            <div id="agent4" class="agent-status">
+                <strong>AGENT 4: LATERAL MAPPER</strong><br>
+                <small>Status: Idle</small>
+            </div>
+
+            <div id="agent3" class="agent-status">
+                <strong>AGENT 3: EXFILTRATION</strong><br>
+                <small>Status: Idle</small>
+            </div>
+
+            <div style="margin-top: 30px; border-top: 1px solid #333; pt:10px;">
+                <div style="font-size:12px; color:#aaa;">ATTACK PROGRESSION</div>
+                <div class="progress-bar"><div id="attack-progress" class="progress-fill"></div></div>
+                <div id="threat-level" style="margin-top:5px; font-size:20px; font-weight:bold; color:#555;">LOW</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const logs = document.getElementById('log-window');
+        const status = document.getElementById('system-status');
+        const progress = document.getElementById('attack-progress');
+        const threatText = document.getElementById('threat-level');
+
+        function addLog(text, type='normal') {
+            const div = document.createElement('div');
+            const time = new Date().toLocaleTimeString('en-US', {hour12: false}) + "." + Math.floor(Math.random() * 999);
+            div.innerHTML = `<span style="color:#666;">[${time}]</span> ${text}`;
+            if(type === 'danger') div.style.color = '#ff4444';
+            if(type === 'success') div.style.color = '#00ff41';
+            if(type === 'warning') div.style.color = 'orange';
+            logs.appendChild(div);
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        function updateAgent(id, state, msg) {
+            const el = document.getElementById(id);
+            if(state === 'active') {
+                el.className = 'agent-status agent-active';
+                el.querySelector('small').innerText = "Status: SCANNING...";
+            } else if (state === 'alert') {
+                el.className = 'agent-status agent-alert';
+                el.querySelector('small').innerText = `ALERT: ${msg}`;
+            } else {
+                el.className = 'agent-status';
+                el.querySelector('small').innerText = "Status: Idle";
+            }
+        }
+
+        async function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+        async function startSimulation() {
+            document.getElementById('start-btn').disabled = true;
+            document.getElementById('start-btn').innerText = "SIMULATION RUNNING...";
+            logs.innerHTML = "";
+            
+            // Normal Traffic
+            status.innerText = "NORMAL OPERATIONS";
+            status.style.color = "#00ff41";
+            for(let i=0; i<5; i++) {
+                addLog("Ingesting API logs from AWS-East-1...");
+                await wait(400);
+                addLog("User authentication verified: j.doe@company.com");
+                await wait(300);
+            }
+
+            // Phase 1: The Breach
+            await wait(1000);
+            addLog("WARNING: Anomaly detected in API Header requests.", "warning");
+            updateAgent('agent5', 'active');
+            await wait(1000);
+            addLog("CRITICAL: Model Context Protocol (MCP) signature identified.", "danger");
+            updateAgent('agent5', 'alert', 'MCP ORCHESTRATION DETECTED');
+            progress.style.width = "20%";
+            threatText.innerText = "ELEVATED";
+            threatText.style.color = "orange";
+
+            // Phase 2: Tempo
+            await wait(1500);
+            addLog("Traffic spike detected on Endpoint /v1/users", "warning");
+            updateAgent('agent1', 'active');
+            await wait(800);
+            addLog("ANALYSIS: 4,200 requests in 60 seconds.", "danger");
+            addLog("CONCLUSION: Speed exceeds human capability.", "danger");
+            updateAgent('agent1', 'alert', 'IMPOSSIBLE OPERATIONAL TEMPO');
+            progress.style.width = "50%";
+            threatText.innerText = "HIGH";
+            threatText.style.color = "#ff4444";
+
+            // Phase 3: Lateral Movement
+            await wait(1500);
+            addLog("Identity compromise suspected. Admin 'root' accessing DB_FINANCE.", "danger");
+            updateAgent('agent4', 'alert', 'LATERAL MOVEMENT (FINANCE DB)');
+            progress.style.width = "80%";
+            threatText.innerText = "CRITICAL";
+            threatText.className = "blink";
+            threatText.style.color = "red";
+
+            // Phase 4: Response
+            await wait(2000);
+            addLog("--- GATRA AUTOMATED RESPONSE INITIATED ---", "success");
+            updateAgent('agent3', 'active');
+            await wait(500);
+            addLog("Block command sent to Firewall ID: FW-992", "success");
+            addLog("Revoking session token for user 'root'", "success");
+            addLog("Isolating affected host 192.168.1.55", "success");
+            
+            progress.style.background = "#00ff41";
+            progress.style.width = "100%";
+            
+            updateAgent('agent1', 'active', 'Resolving...');
+            updateAgent('agent5', 'active', 'Resolving...');
+            updateAgent('agent4', 'active', 'Resolving...');
+            updateAgent('agent3', 'active', 'Resolving...');
+
+            await wait(1000);
+            status.innerText = "THREAT NEUTRALIZED";
+            status.style.color = "#00ff41";
+            threatText.className = "";
+            threatText.innerText = "SECURE";
+            threatText.style.color = "#00ff41";
+            
+            addLog("------------------------------------------------");
+            addLog("SUMMARY:", "success");
+            addLog("Attack Type: AI-Driven (GTG-1002 variant)");
+            addLog("Total Time Elapsed: 15 seconds");
+            addLog("Data Lost: 0 bytes");
+            addLog("Human Intervention: NONE");
+
+            document.getElementById('start-btn').innerText = "RESTART SIMULATION";
+            document.getElementById('start-btn').disabled = false;
+        }
+    </script>
+</body>
+</html>
