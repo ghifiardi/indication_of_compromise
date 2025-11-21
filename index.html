@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GATRA Platform - Live Demos</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        h1 {
+            font-size: 3.5em;
+            margin: 0;
+            background: linear-gradient(45deg, #00ff41, #00ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 3px;
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            color: #888;
+            margin-top: 10px;
+        }
+        
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .demo-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .demo-card:hover {
+            transform: translateY(-5px);
+            border-color: #00ff41;
+            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.2);
+        }
+        
+        .demo-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #00ff41;
+        }
+        
+        .demo-description {
+            color: #ccc;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        
+        .demo-features {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 25px;
+        }
+        
+        .demo-features li {
+            padding: 5px 0;
+            color: #aaa;
+        }
+        
+        .demo-features li::before {
+            content: "✓ ";
+            color: #00ff41;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .demo-button {
+            display: inline-block;
+            background: linear-gradient(45deg, #00ff41, #00cc33);
+            color: #000;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .demo-button:hover {
+            background: linear-gradient(45deg, #00cc33, #009926);
+            transform: scale(1.05);
+        }
+        
+        .version-badge {
+            display: inline-block;
+            background: #ff3333;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .info-section {
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid #00ff41;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 40px;
+        }
+        
+        .info-section h3 {
+            color: #00ff41;
+            margin-top: 0;
+        }
+        
+        .repo-link {
+            color: #00ccff;
+            text-decoration: none;
+        }
+        
+        .repo-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>GATRA</h1>
+            <div class="subtitle">AI-Driven Security Operations Center Platform</div>
+            <div class="subtitle">Live Interactive Demonstrations</div>
+        </header>
+        
+        <div class="demo-grid">
+            <div class="demo-card">
+                <div class="demo-title">
+                    GATRA v1.0 
+                    <span class="version-badge">STABLE</span>
+                </div>
+                <div class="demo-description">
+                    Original GATRA platform demonstration showing the complete GTG-1002 attack simulation with real-time threat detection and automated response.
+                </div>
+                <ul class="demo-features">
+                    <li>5-Agent AI coordination</li>
+                    <li>15-second threat neutralization</li>
+                    <li>Attack progression visualization</li>
+                    <li>Automated response demonstration</li>
+                </ul>
+                <a href="demo.html" class="demo-button">Launch v1.0 Demo</a>
+            </div>
+            
+            <div class="demo-card">
+                <div class="demo-title">
+                    GATRA v2.0 
+                    <span class="version-badge">ADVANCED</span>
+                </div>
+                <div class="demo-description">
+                    Enhanced simulation engine with advanced metrics, MITRE ATT&CK framework integration, and sophisticated behavioral analysis dashboard.
+                </div>
+                <ul class="demo-features">
+                    <li>Real-time behavioral metrics</li>
+                    <li>MITRE ATT&CK technique mapping</li>
+                    <li>Advanced threat scoring</li>
+                    <li>Multi-phase attack lifecycle</li>
+                    <li>Enhanced visual interface</li>
+                </ul>
+                <a href="gatra_v2.html" class="demo-button">Launch v2.0 Demo</a>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <h3>About These Demonstrations</h3>
+            <p>
+                These interactive simulations demonstrate GATRA's capability to detect and neutralize 
+                AI-orchestrated cyberattacks in real-time. Both demos simulate the GTG-1002 campaign, 
+                showcasing how GATRA's multi-agent architecture can identify and respond to threats 
+                that traditional SOCs would miss.
+            </p>
+            <p>
+                <strong>Repository:</strong> 
+                <a href="https://github.com/ghifiardi/indication_of_compromise" class="repo-link" target="_blank">
+                    github.com/ghifiardi/indication_of_compromise
+                </a>
+            </p>
+            <p>
+                <strong>Documentation:</strong> Complete deployment guides, technical specifications, 
+                and executive briefing materials are available in the repository.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
