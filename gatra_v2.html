@@ -1,24 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GATRA v2.0 | Advanced Threat Simulation</title>
     <style>
         :root {
             --bg-color: #050505;
-            --panel-bg: #0a0a0a;
+            --panel-bg: rgba(10, 10, 10, 0.85);
             --text-main: #e0e0e0;
+            --text-muted: #666;
             --accent-green: #00ff41;
             --accent-red: #ff3333;
             --accent-orange: #ffaa00;
             --accent-blue: #00ccff;
+            --accent-purple: #bc13fe;
             --border: 1px solid #333;
+            --font-mono: 'Fira Code', 'Consolas', 'Monaco', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
             background-color: var(--bg-color);
+            background-image:
+                linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
             color: var(--text-main);
-            font-family: 'Consolas', 'Monaco', monospace;
+            font-family: var(--font-mono);
             margin: 0;
             padding: 10px;
             height: 100vh;
@@ -32,143 +45,402 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #333;
+            padding: 10px 15px;
+            background: var(--panel-bg);
+            border: var(--border);
+            border-bottom: 2px solid var(--accent-green);
             margin-bottom: 10px;
+            backdrop-filter: blur(5px);
         }
 
-        h1 { margin: 0; font-size: 24px; letter-spacing: 2px; }
-        .sub-header { font-size: 12px; color: #666; }
-        
+        h1 {
+            margin: 0;
+            font-size: 20px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .sub-header {
+            font-size: 10px;
+            color: var(--accent-blue);
+            letter-spacing: 1px;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 12px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 10px;
+        }
+
+        .stat-val {
+            font-weight: bold;
+            color: var(--accent-green);
+        }
+
         button {
-            background: #222;
+            background: rgba(0, 255, 65, 0.1);
             color: var(--accent-green);
             border: 1px solid var(--accent-green);
             padding: 8px 20px;
             cursor: pointer;
             font-family: inherit;
             font-weight: bold;
+            font-size: 12px;
             transition: 0.2s;
+            text-transform: uppercase;
         }
-        button:hover { background: var(--accent-green); color: #000; }
-        button:disabled { border-color: #555; color: #555; cursor: not-allowed; background: #111; }
+
+        button:hover {
+            background: var(--accent-green);
+            color: #000;
+            box-shadow: 0 0 10px var(--accent-green);
+        }
+
+        button:disabled {
+            border-color: #444;
+            color: #444;
+            cursor: not-allowed;
+            background: transparent;
+            box-shadow: none;
+        }
 
         /* --- GRID LAYOUT --- */
         .dashboard-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
+            grid-template-columns: 350px 1fr 300px;
+            grid-template-rows: 2fr 1fr;
             gap: 10px;
             flex-grow: 1;
+            height: calc(100vh - 80px);
         }
 
         .panel {
             background: var(--panel-bg);
             border: var(--border);
-            padding: 10px;
+            padding: 0;
             position: relative;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
-        .panel-title {
+        .panel-header {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 5px 10px;
             font-size: 11px;
             text-transform: uppercase;
-            color: #888;
-            border-bottom: 1px solid #222;
-            padding-bottom: 5px;
-            margin-bottom: 5px;
+            color: var(--accent-blue);
+            border-bottom: 1px solid #333;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header .dots {
+            letter-spacing: 2px;
+            color: #444;
         }
 
         /* --- LOG FEED --- */
-        #log-panel { grid-column: 1 / 2; grid-row: 1 / 3; }
+        #log-panel {
+            grid-column: 1 / 2;
+            grid-row: 1 / 3;
+        }
+
         #log-stream {
             flex-grow: 1;
-            overflow-y: hidden; /* We handle scroll via JS */
-            font-size: 12px;
+            overflow-y: hidden;
+            font-size: 11px;
             line-height: 1.4;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
+            font-family: 'Monaco', monospace;
         }
-        .log-entry { margin-bottom: 2px; word-break: break-all; }
-        .log-time { color: #555; margin-right: 8px; }
-        .tag-mitre { color: var(--accent-orange); font-weight: bold; margin-right: 5px; }
-        .tag-norm { color: #888; }
-        .tag-crit { color: var(--accent-red); font-weight: bold; }
+
+        .log-entry {
+            margin-bottom: 4px;
+            border-left: 2px solid transparent;
+            padding-left: 5px;
+            opacity: 0.8;
+        }
+
+        .log-entry:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .log-time {
+            color: #555;
+        }
+
+        .key {
+            color: #888;
+        }
+
+        .str {
+            color: var(--accent-blue);
+        }
+
+        .num {
+            color: var(--accent-orange);
+        }
+
+        .crit {
+            border-left-color: var(--accent-red);
+            background: rgba(255, 51, 51, 0.05);
+        }
+
+        .warn {
+            border-left-color: var(--accent-orange);
+        }
+
+        .info {
+            border-left-color: var(--accent-green);
+        }
+
+        /* --- MAP & VISUALIZATION --- */
+        #map-panel {
+            grid-column: 2 / 3;
+            grid-row: 1 / 2;
+            position: relative;
+        }
+
+        canvas#attack-map {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .map-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            pointer-events: none;
+        }
+
+        .overlay-stat {
+            font-size: 10px;
+            color: var(--accent-green);
+            margin-bottom: 2px;
+        }
 
         /* --- METRICS --- */
-        #metrics-panel { grid-column: 2 / 3; grid-row: 1 / 2; }
-        .metric-row {
+        #metrics-panel {
+            grid-column: 2 / 3;
+            grid-row: 2 / 3;
+            display: flex;
+            flex-direction: row;
+            gap: 1px;
+            background: #333;
+        }
+
+        .metric-col {
+            flex: 1;
+            background: var(--panel-bg);
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+        }
+
+        .chart-container {
+            flex-grow: 1;
+            position: relative;
+            width: 100%;
+        }
+
+        canvas.metric-chart {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .metric-val {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            margin: 5px 0;
+        }
+
+        .metric-label {
+            font-size: 10px;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        /* --- THREAT & AGENTS --- */
+        #side-panel {
+            grid-column: 3 / 4;
+            grid-row: 1 / 3;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: transparent;
+            border: none;
+        }
+
+        .side-module {
+            background: var(--panel-bg);
+            border: var(--border);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #threat-score-box {
+            text-align: center;
+            padding: 20px 10px;
+            border-bottom: 2px solid var(--accent-green);
+        }
+
+        #threat-val {
+            font-size: 48px;
+            font-weight: bold;
+            color: var(--accent-green);
+            line-height: 1;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+        }
+
+        #threat-lbl {
+            font-size: 12px;
+            letter-spacing: 3px;
+            margin-top: 5px;
+            color: var(--accent-green);
+        }
+
+        .agent-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .agent-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 8px;
+            border-left: 2px solid #444;
+            font-size: 11px;
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 13px;
+            align-items: center;
         }
-        .bar-container {
-            width: 60%;
-            background: #222;
-            height: 10px;
-            margin-top: 4px;
-        }
-        .bar-fill { height: 100%; width: 0%; transition: width 0.5s ease-out; }
 
-        /* --- THREAT SCORE --- */
-        #threat-panel { grid-column: 3 / 4; grid-row: 1 / 2; text-align: center; }
-        #threat-score {
-            font-size: 60px;
+        .agent-item.active {
+            border-left-color: var(--accent-green);
+            background: rgba(0, 255, 65, 0.05);
+        }
+
+        .agent-item.alert {
+            border-left-color: var(--accent-red);
+            background: rgba(255, 51, 51, 0.1);
+        }
+
+        .agent-status {
+            font-size: 9px;
+            color: #888;
+        }
+
+        .agent-name {
             font-weight: bold;
-            margin: 20px 0;
-            color: var(--accent-green);
-            transition: color 0.5s;
         }
-        #threat-label { font-size: 14px; letter-spacing: 2px; }
 
-        /* --- AGENTS --- */
-        #agents-panel { grid-column: 2 / 3; grid-row: 2 / 3; overflow-y: auto; }
-        .agent-card {
-            background: #111;
-            border-left: 3px solid #333;
-            padding: 8px;
-            margin-bottom: 6px;
-            font-size: 12px;
-            transition: 0.3s;
-        }
-        .agent-active { border-left-color: var(--accent-green); background: #001a00; }
-        .agent-alert { border-left-color: var(--accent-red); background: #1a0000; }
-
-        /* --- TIMELINE --- */
-        #timeline-panel { grid-column: 3 / 4; grid-row: 2 / 3; }
-        #timeline-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            font-size: 12px;
-            overflow-y: auto;
+        #console-output {
             flex-grow: 1;
-        }
-        #timeline-list li {
-            border-bottom: 1px solid #222;
-            padding: 5px 0;
+            background: #000;
+            border: 1px solid #333;
+            padding: 5px;
+            font-size: 10px;
             color: #aaa;
+            overflow-y: auto;
+            font-family: 'Monaco', monospace;
+            height: 150px;
         }
-        #timeline-list li::before { content: "> "; color: #555; }
-        .timeline-highlight { color: #fff !important; }
+
+        .console-line {
+            margin-bottom: 2px;
+        }
+
+        .console-line::before {
+            content: "> ";
+            color: #555;
+        }
 
         /* UTILS */
-        .blink { animation: blinker 1s linear infinite; }
-        @keyframes blinker { 50% { opacity: 0.3; } }
+        .blink {
+            animation: blinker 1s linear infinite;
+        }
 
+        @keyframes blinker {
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .glitch {
+            animation: glitch 0.2s cubic-bezier(.25, .46, .45, .94) both infinite;
+            color: var(--accent-red);
+        }
+
+        @keyframes glitch {
+            0% {
+                transform: translate(0)
+            }
+
+            20% {
+                transform: translate(-2px, 2px)
+            }
+
+            40% {
+                transform: translate(-2px, -2px)
+            }
+
+            60% {
+                transform: translate(2px, 2px)
+            }
+
+            80% {
+                transform: translate(2px, -2px)
+            }
+
+            100% {
+                transform: translate(0)
+            }
+        }
     </style>
 </head>
+
 <body>
 
     <header>
         <div>
             <h1>GATRA v2.0 <span style="color:var(--accent-blue)">// SIMULATION ENGINE</span></h1>
             <div class="sub-header">REAL-TIME THREAT EMULATION: GTG-1002 CAMPAIGN</div>
+        </div>
+        <div class="header-stats">
+            <div class="stat-item">
+                <span class="stat-label">UPTIME</span>
+                <span class="stat-val" id="uptime">00:00:00</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">ACTIVE NODES</span>
+                <span class="stat-val" id="val-nodes">1,024</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">DEFCON</span>
+                <span class="stat-val" id="val-defcon" style="color:var(--accent-green)">5</span>
+            </div>
         </div>
         <div>
             <button id="btn-start" onclick="startCampaign()">INITIATE ATTACK</button>
@@ -177,293 +449,545 @@
     </header>
 
     <div class="dashboard-grid">
+        <!-- LEFT: LOGS -->
         <div class="panel" id="log-panel">
-            <div class="panel-title">
-                <span>INGESTION STREAM (ElasticSearch)</span>
-                <span id="log-rate">84 EPS</span>
+            <div class="panel-header">
+                <span>INGESTION STREAM (ELASTIC)</span>
+                <span class="dots">:::</span>
             </div>
             <div id="log-stream"></div>
         </div>
 
+        <!-- CENTER TOP: MAP -->
+        <div class="panel" id="map-panel">
+            <div class="panel-header">
+                <span>GLOBAL NETWORK ACTIVITY</span>
+                <span class="dots">:::</span>
+            </div>
+            <canvas id="attack-map"></canvas>
+            <div class="map-overlay">
+                <div class="overlay-stat">SRC: GLOBAL</div>
+                <div class="overlay-stat">DST: US-EAST-1</div>
+            </div>
+        </div>
+
+        <!-- CENTER BOTTOM: METRICS -->
         <div class="panel" id="metrics-panel">
-            <div class="panel-title">BEHAVIORAL METRICS (BASELINE VS REALTIME)</div>
-            
-            <div style="margin-top:10px;">
-                <div class="metric-row">
-                    <span>API TEMPO (Req/Min)</span>
-                    <span id="val-tempo">82</span>
-                </div>
-                <div class="bar-container"><div id="bar-tempo" class="bar-fill" style="background:var(--accent-blue); width: 10%;"></div></div>
+            <div class="metric-col">
+                <span class="metric-label">REQUESTS / SEC</span>
+                <span class="metric-val" id="val-rps" style="color:var(--accent-blue)">0</span>
+                <div class="chart-container"><canvas id="chart-rps" class="metric-chart"></canvas></div>
             </div>
-
-            <div style="margin-top:15px;">
-                <div class="metric-row">
-                    <span>MCP SIGNATURES</span>
-                    <span id="val-mcp">0.0%</span>
-                </div>
-                <div class="bar-container"><div id="bar-mcp" class="bar-fill" style="background:var(--accent-orange); width: 0%;"></div></div>
+            <div class="metric-col">
+                <span class="metric-label">NETWORK (MB/s)</span>
+                <span class="metric-val" id="val-net" style="color:var(--accent-purple)">0.0</span>
+                <div class="chart-container"><canvas id="chart-net" class="metric-chart"></canvas></div>
             </div>
-
-            <div style="margin-top:15px;">
-                <div class="metric-row">
-                    <span>DATA EGRESS (MB/s)</span>
-                    <span id="val-egress">0.2</span>
-                </div>
-                <div class="bar-container"><div id="bar-egress" class="bar-fill" style="background:var(--accent-red); width: 1%;"></div></div>
+            <div class="metric-col">
+                <span class="metric-label">ERROR RATE (%)</span>
+                <span class="metric-val" id="val-err" style="color:var(--accent-red)">0.0</span>
+                <div class="chart-container"><canvas id="chart-err" class="metric-chart"></canvas></div>
             </div>
         </div>
 
-        <div class="panel" id="threat-panel">
-            <div class="panel-title">GLOBAL THREAT LEVEL</div>
-            <div id="threat-score">0</div>
-            <div id="threat-label" style="color:var(--accent-green)">SECURE</div>
-        </div>
+        <!-- RIGHT: SIDEBAR -->
+        <div id="side-panel">
+            <div class="side-module" id="threat-score-box">
+                <div style="font-size:10px; color:#666; margin-bottom:10px;">THREAT LEVEL</div>
+                <div id="threat-val">0</div>
+                <div id="threat-lbl">SECURE</div>
+            </div>
 
-        <div class="panel" id="agents-panel">
-            <div class="panel-title">AI AGENT STATUS</div>
-            <div id="agent-1" class="agent-card"><strong>AGENT 1: TEMPO</strong><br><span class="status">Monitoring baseline...</span></div>
-            <div id="agent-5" class="agent-card"><strong>AGENT 5: INFRASTRUCTURE</strong><br><span class="status">Scanning protocols...</span></div>
-            <div id="agent-4" class="agent-card"><strong>AGENT 4: LATERAL MOVEMENT</strong><br><span class="status">Tracking User: root</span></div>
-            <div id="agent-3" class="agent-card"><strong>AGENT 3: RESPONSE</strong><br><span class="status">Standby</span></div>
-        </div>
+            <div class="side-module" style="flex-grow:0;">
+                <div class="panel-header" style="padding:0; margin-bottom:5px; border:none;">AGENTS</div>
+                <div class="agent-list">
+                    <div class="agent-item" id="agent-1">
+                        <div>
+                            <div class="agent-name">TEMPO_MONITOR</div>
+                            <div class="agent-status">Scanning baseline...</div>
+                        </div>
+                        <div style="width:8px; height:8px; background:#444; border-radius:50%;" class="status-dot">
+                        </div>
+                    </div>
+                    <div class="agent-item" id="agent-2">
+                        <div>
+                            <div class="agent-name">IAM_WATCHDOG</div>
+                            <div class="agent-status">Monitoring auth...</div>
+                        </div>
+                        <div style="width:8px; height:8px; background:#444; border-radius:50%;" class="status-dot">
+                        </div>
+                    </div>
+                    <div class="agent-item" id="agent-3">
+                        <div>
+                            <div class="agent-name">NET_SENTINEL</div>
+                            <div class="agent-status">Deep Packet Insp...</div>
+                        </div>
+                        <div style="width:8px; height:8px; background:#444; border-radius:50%;" class="status-dot">
+                        </div>
+                    </div>
+                    <div class="agent-item" id="agent-4">
+                        <div>
+                            <div class="agent-name">AUTO_RESPONDER</div>
+                            <div class="agent-status">Standby</div>
+                        </div>
+                        <div style="width:8px; height:8px; background:#444; border-radius:50%;" class="status-dot">
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <div class="panel" id="timeline-panel">
-            <div class="panel-title">ATTACK LIFECYCLE</div>
-            <ul id="timeline-list">
-                </ul>
+            <div class="side-module" style="flex-grow:1; display:flex; flex-direction:column;">
+                <div class="panel-header" style="padding:0; margin-bottom:5px; border:none;">SYSTEM CONSOLE</div>
+                <div id="console-output"></div>
+            </div>
         </div>
     </div>
 
     <script>
-        // --- CONFIGURATION & STATE ---
-        const config = {
-            normalTempo: 80,
-            attackTempo: 4200,
-            users: ["j.doe", "m.smith", "sys_admin", "svc_backup", "root"],
-            ips: ["192.168.1.45", "10.0.5.22", "172.16.0.4", "192.168.1.102"],
-            endpoints: ["/auth/login", "/v1/getData", "/api/userinfo", "/health"],
-            maliciousIP: "45.133.x.x"
+        // --- CONSTANTS & CONFIG ---
+        const CONFIG = {
+            users: ["j.doe", "m.smith", "sys_admin", "svc_backup", "root", "deploy_bot"],
+            ips: ["192.168.1.45", "10.0.5.22", "172.16.0.4", "192.168.1.102", "10.20.1.5"],
+            extIps: ["45.133.20.1", "185.220.101.4", "89.248.165.2", "103.208.86.5"],
+            userAgents: [
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
+                "python-requests/2.26.0",
+                "curl/7.64.1",
+                "Go-http-client/1.1"
+            ],
+            endpoints: ["/auth/login", "/v1/getData", "/api/userinfo", "/health", "/admin/config"],
+            methods: ["GET", "POST", "PUT", "DELETE"]
         };
 
+        // --- STATE ---
         let state = {
-            isRunning: false,
-            phase: 0, // 0=Idle, 1=Recon, 2=Tempo, 3=Lateral, 4=Exfil, 5=Response
-            tempo: 80,
-            mcpScore: 0,
-            egress: 0.2,
-            threatScore: 0,
-            logs: []
+            running: false,
+            phase: 0, // 0=Idle, 1=Recon, 2=Weapon, 3=Delivery, 4=Lateral, 5=Exfil, 6=Defense
+            tick: 0,
+            metrics: {
+                rps: 12,
+                net: 0.5,
+                err: 0.1
+            },
+            activeNodes: 1024,
+            defcon: 5,
+            threat: 0,
+            logs: [],
+            attacks: [] // Active attack lines on map
         };
 
-        let loopInterval;
+        // --- CANVAS SETUP ---
+        const mapCanvas = document.getElementById('attack-map');
+        const mapCtx = mapCanvas.getContext('2d');
+        const chartRps = document.getElementById('chart-rps').getContext('2d');
+        const chartNet = document.getElementById('chart-net').getContext('2d');
+        const chartErr = document.getElementById('chart-err').getContext('2d');
 
-        // --- DOM ELEMENTS ---
-        const ui = {
-            logs: document.getElementById('log-stream'),
-            tempoVal: document.getElementById('val-tempo'),
-            tempoBar: document.getElementById('bar-tempo'),
-            mcpVal: document.getElementById('val-mcp'),
-            mcpBar: document.getElementById('bar-mcp'),
-            egressVal: document.getElementById('val-egress'),
-            egressBar: document.getElementById('bar-egress'),
-            threatScore: document.getElementById('threat-score'),
-            threatLabel: document.getElementById('threat-label'),
-            timeline: document.getElementById('timeline-list')
-        };
+        // Resize observer for canvas
+        function resizeCanvas() {
+            [mapCanvas, document.getElementById('chart-rps'), document.getElementById('chart-net'), document.getElementById('chart-err')].forEach(c => {
+                c.width = c.parentElement.offsetWidth;
+                c.height = c.parentElement.offsetHeight;
+            });
+        }
+        window.addEventListener('resize', resizeCanvas);
+        setTimeout(resizeCanvas, 100);
 
-        // --- HELPER FUNCTIONS ---
-        const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-        const randArr = (arr) => arr[rand(0, arr.length - 1)];
-        const getTimestamp = () => new Date().toISOString().split('T')[1].slice(0, 12);
-
-        // --- REALISTIC LOG GENERATOR ---
-        function generateLog(type = 'normal') {
-            const ts = getTimestamp();
-            let msg = "";
-            let style = "tag-norm";
-
-            if (type === 'normal') {
-                const u = randArr(config.users);
-                const ip = randArr(config.ips);
-                const ep = randArr(config.endpoints);
-                msg = `Auth: user=${u} src=${ip} endpoint=${ep} status=200 latency=${rand(10, 50)}ms`;
-            } else if (type === 'mcp') {
-                msg = `<span class="tag-mitre">[T1588]</span> MCP Protocol handshake detected via API Header from ${config.maliciousIP}`;
-                style = "tag-crit";
-            } else if (type === 'tempo') {
-                msg = `<span class="tag-mitre">[T1071]</span> FLOOD: Rate limit exceeded /v1/users src=${config.maliciousIP} count=${rand(300, 500)}`;
-                style = "tag-crit";
-            } else if (type === 'lateral') {
-                msg = `<span class="tag-mitre">[T1078]</span> SUSPICIOUS: User 'root' accessing DB_FINANCE from non-admin subnet`;
-                style = "tag-crit";
-            } else if (type === 'exfil') {
-                msg = `<span class="tag-mitre">[T1048]</span> DLP ALERT: 500MB archive upload initiated to ext IP`;
-                style = "tag-crit";
-            } else if (type === 'block') {
-                msg = `SOAR ACTION: IP ${config.maliciousIP} Blocked at Firewall Edge.`;
-                style = "color:#00ff41; font-weight:bold;";
+        // --- CHART CLASS ---
+        class LineChart {
+            constructor(ctx, color, maxVal) {
+                this.ctx = ctx;
+                this.color = color;
+                this.data = new Array(50).fill(0);
+                this.maxVal = maxVal;
             }
+            push(val) {
+                this.data.push(val);
+                this.data.shift();
+            }
+            draw() {
+                const w = this.ctx.canvas.width;
+                const h = this.ctx.canvas.height;
+                this.ctx.clearRect(0, 0, w, h);
 
+                this.ctx.beginPath();
+                this.ctx.strokeStyle = this.color;
+                this.ctx.lineWidth = 2;
+
+                const step = w / (this.data.length - 1);
+
+                this.data.forEach((val, i) => {
+                    const x = i * step;
+                    const y = h - ((val / this.maxVal) * h);
+                    if (i === 0) this.ctx.moveTo(x, y);
+                    else this.ctx.lineTo(x, y);
+                });
+                this.ctx.stroke();
+
+                // Fill
+                this.ctx.lineTo(w, h);
+                this.ctx.lineTo(0, h);
+                this.ctx.fillStyle = this.color + "22"; // Low opacity
+                this.ctx.fill();
+            }
+        }
+
+        const charts = {
+            rps: new LineChart(chartRps, '#00ccff', 2000),
+            net: new LineChart(chartNet, '#bc13fe', 500),
+            err: new LineChart(chartErr, '#ff3333', 100)
+        };
+
+        // --- MAP LOGIC (DOT WORLD MAP) ---
+        // A simplified dot representation of continents
+        // 0=Empty, 1=NA, 2=SA, 3=EU, 4=AF, 5=AS, 6=OC
+        const worldGrid = [
+            "000000000000000000000000000000",
+            "000011100000000000000000000000",
+            "000111110000000000055555000000",
+            "000111110000003330055555550000",
+            "000011100000033333055555550000",
+            "000001000000003330005555500000",
+            "000000000000044440000555000000",
+            "000000222000004440000000660000",
+            "000000222200004440000006600000",
+            "000000022000000400000000000000",
+            "000000000000000000000000000000"
+        ];
+
+        const nodes = [];
+        const countryMap = {
+            "US": { x: 0.2, y: 0.35, region: 1 },
+            "BR": { x: 0.28, y: 0.7, region: 2 },
+            "DE": { x: 0.48, y: 0.35, region: 3 },
+            "RU": { x: 0.65, y: 0.25, region: 5 },
+            "CN": { x: 0.75, y: 0.4, region: 5 },
+            "IN": { x: 0.68, y: 0.5, region: 5 },
+            "AU": { x: 0.85, y: 0.75, region: 6 },
+            "ZA": { x: 0.52, y: 0.8, region: 4 }
+        };
+
+        // Parse grid to nodes
+        const rows = worldGrid.length;
+        const cols = worldGrid[0].length;
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                if (worldGrid[r][c] !== '0') {
+                    nodes.push({
+                        x: (c / cols) * 0.9 + 0.05, // Margin
+                        y: (r / rows) * 0.8 + 0.1,
+                        region: parseInt(worldGrid[r][c])
+                    });
+                }
+            }
+        }
+
+        const hqNode = { x: 0.22, y: 0.38 }; // US East roughly
+
+        function drawMap() {
+            const w = mapCanvas.width;
+            const h = mapCanvas.height;
+            mapCtx.clearRect(0, 0, w, h);
+
+            // Draw World Dots
+            mapCtx.fillStyle = "#222";
+            nodes.forEach(n => {
+                mapCtx.beginPath();
+                mapCtx.arc(n.x * w, n.y * h, 2, 0, Math.PI * 2);
+                mapCtx.fill();
+            });
+
+            // Draw HQ
+            mapCtx.fillStyle = "#00ff41";
+            mapCtx.beginPath();
+            mapCtx.arc(hqNode.x * w, hqNode.y * h, 4, 0, Math.PI * 2);
+            mapCtx.fill();
+            mapCtx.shadowBlur = 10;
+            mapCtx.shadowColor = "#00ff41";
+            mapCtx.stroke();
+            mapCtx.shadowBlur = 0;
+
+            // Draw Attacks
+            state.attacks = state.attacks.filter(a => a.life > 0);
+            state.attacks.forEach(a => {
+                a.life--;
+                const sx = a.src.x * w;
+                const sy = a.src.y * h;
+                const dx = hqNode.x * w;
+                const dy = hqNode.y * h;
+
+                // Line
+                mapCtx.beginPath();
+                mapCtx.strokeStyle = a.color;
+                mapCtx.lineWidth = 1.5;
+                mapCtx.moveTo(sx, sy);
+                mapCtx.lineTo(dx, dy);
+                mapCtx.stroke();
+
+                // Particle
+                const progress = 1 - (a.life / 40); // Slower animation
+                const px = sx + (dx - sx) * progress;
+                const py = sy + (dy - sy) * progress;
+
+                mapCtx.fillStyle = "#fff";
+                mapCtx.beginPath();
+                mapCtx.arc(px, py, 2, 0, Math.PI * 2);
+                mapCtx.fill();
+
+                // Label (Only at start)
+                if (a.life > 20) {
+                    mapCtx.fillStyle = a.color;
+                    mapCtx.font = "10px monospace";
+                    mapCtx.fillText(`[${a.country}] ${a.type}`, sx + 5, sy);
+                }
+            });
+        }
+
+        function triggerAttackVisual(country, type, color = "#ff3333") {
+            let src = countryMap[country];
+            if (!src) src = nodes[Math.floor(Math.random() * nodes.length)]; // Fallback
+
+            // Add slight jitter so lines don't perfectly overlap
+            const jitterX = (Math.random() - 0.5) * 0.02;
+            const jitterY = (Math.random() - 0.5) * 0.02;
+
+            state.attacks.push({
+                src: { x: src.x + jitterX, y: src.y + jitterY },
+                country: country,
+                type: type,
+                life: 40,
+                color: color
+            });
+        }
+
+        // --- LOGGING LOGIC ---
+        function addLog(entry, type = "info") {
             const el = document.createElement('div');
-            el.className = 'log-entry';
-            el.innerHTML = `<span class="log-time">[${ts}]</span> <span class="${style}">${msg}</span>`;
-            ui.logs.appendChild(el);
-            
-            // Keep DOM clean (limit 20 lines)
-            if (ui.logs.children.length > 20) ui.logs.removeChild(ui.logs.firstChild);
+            el.className = `log-entry ${type}`;
+
+            // Format as pseudo-JSON
+            const ts = new Date().toISOString();
+            let jsonStr = `<span class="key">"@timestamp":</span> "<span class="str">${ts}</span>", `;
+
+            for (const [k, v] of Object.entries(entry)) {
+                let valHtml = typeof v === 'number' ? `<span class="num">${v}</span>` : `<span class="str">"${v}"</span>`;
+                jsonStr += `<span class="key">"${k}":</span> ${valHtml}, `;
+            }
+
+            // Truncate trailing comma
+            jsonStr = `{ ${jsonStr.slice(0, -2)} }`;
+
+            el.innerHTML = jsonStr;
+            const container = document.getElementById('log-stream');
+            container.appendChild(el);
+            if (container.children.length > 15) container.removeChild(container.firstChild);
         }
 
-        // --- CORE SIMULATION LOOP ---
+        function logConsole(msg) {
+            const el = document.getElementById('console-output');
+            const line = document.createElement('div');
+            line.className = 'console-line';
+            line.innerText = msg;
+            el.appendChild(line);
+            el.scrollTop = el.scrollHeight;
+        }
+
+        // --- SIMULATION LOOP ---
         function runLoop() {
-            // 1. Generate Logs
-            // If we are in attack phases, mix in malicious logs
-            if (state.phase === 0) {
-                if (rand(0,10) > 3) generateLog('normal'); // 70% chance of log
-            } else if (state.phase === 1) { // Recon
-                if (rand(0,10) > 6) generateLog('mcp');
-                else generateLog('normal');
-                state.mcpScore += 5;
-            } else if (state.phase === 2) { // Tempo
-                if (rand(0,10) > 2) generateLog('tempo');
-                state.tempo += rand(50, 100);
-            } else if (state.phase === 3) { // Lateral
-                if (rand(0,10) > 5) generateLog('lateral');
-                state.tempo = 4200; // Sustained
-                state.threatScore = 75;
-            } else if (state.phase === 4) { // Exfil
-                generateLog('exfil');
-                state.egress += 50;
-            } else if (state.phase === 5) { // Response
-                generateLog('block');
-                state.tempo = 80;
-                state.egress = 0;
+            state.tick++;
+
+            // Baseline Noise
+            if (Math.random() > 0.7) {
+                addLog({
+                    event: "api_request",
+                    src_ip: CONFIG.ips[Math.floor(Math.random() * CONFIG.ips.length)],
+                    method: "GET",
+                    status: 200,
+                    latency: Math.floor(Math.random() * 50) + 10
+                });
             }
 
-            updateMetrics();
-            calculateThreatScore();
+            // Phase Logic
+            handlePhases();
+
+            // Update Charts
+            charts.rps.push(state.metrics.rps + (Math.random() * 10 - 5));
+            charts.net.push(state.metrics.net + (Math.random() * 0.2 - 0.1));
+            charts.err.push(state.metrics.err);
+
+            Object.values(charts).forEach(c => c.draw());
+            drawMap();
+
+            // Update DOM Stats
+            document.getElementById('val-rps').innerText = Math.floor(state.metrics.rps);
+            document.getElementById('val-net').innerText = state.metrics.net.toFixed(1);
+            document.getElementById('val-err').innerText = state.metrics.err.toFixed(1);
+
+            // Update Header Stats
+            document.getElementById('val-nodes').innerText = Math.floor(state.activeNodes).toLocaleString();
+            const defconEl = document.getElementById('val-defcon');
+            defconEl.innerText = state.defcon;
+
+            // Colorize Defcon
+            if (state.defcon === 1) { defconEl.style.color = "var(--accent-red)"; defconEl.classList.add('blink'); }
+            else if (state.defcon <= 3) { defconEl.style.color = "var(--accent-orange)"; defconEl.classList.remove('blink'); }
+            else { defconEl.style.color = "var(--accent-green)"; defconEl.classList.remove('blink'); }
+
+            // Update Uptime
+            const d = new Date();
+            document.getElementById('uptime').innerText = d.toISOString().split('T')[1].split('.')[0];
         }
 
-        // --- UPDATE UI METRICS ---
-        function updateMetrics() {
-            // Cap values
-            if (state.mcpScore > 100) state.mcpScore = 100;
-            if (state.egress > 1000) state.egress = 1000;
+        function handlePhases() {
+            if (!state.running) return;
 
-            // Render
-            ui.tempoVal.innerText = state.tempo;
-            ui.tempoBar.style.width = Math.min((state.tempo / 4000) * 100, 100) + "%";
+            // Random fluctuations
+            state.metrics.rps += (Math.random() - 0.5);
 
-            ui.mcpVal.innerText = state.mcpScore + "%";
-            ui.mcpBar.style.width = state.mcpScore + "%";
+            switch (state.phase) {
+                case 1: // RECON
+                    state.defcon = 4;
+                    if (Math.random() > 0.8) {
+                        addLog({
+                            event: "port_scan",
+                            src_ip: CONFIG.extIps[0],
+                            dest_port: Math.floor(Math.random() * 65000),
+                            action: "denied"
+                        }, "warn");
+                        triggerAttackVisual("CN", "PORT SCAN", "#ffaa00");
+                    }
+                    setThreat(20, "ELEVATED");
+                    break;
+                case 2: // WEAPONIZATION
+                    state.defcon = 4;
+                    if (Math.random() > 0.9) {
+                        addLog({
+                            event: "file_download",
+                            file: "payload_v2.bin",
+                            user: "j.doe",
+                            hash: "a1b2c3d4..."
+                        }, "warn");
+                        triggerAttackVisual("RU", "MALWARE DL", "#ffaa00");
+                    }
+                    setThreat(35, "SUSPICIOUS");
+                    break;
+                case 3: // DELIVERY (High Tempo)
+                    state.defcon = 3;
+                    state.metrics.rps += 50; // Ramp up
+                    state.metrics.err = 15.5;
+                    // Minor node loss
+                    if (state.tick % 10 === 0 && state.activeNodes > 900) state.activeNodes -= Math.floor(Math.random() * 5);
 
-            ui.egressVal.innerText = state.egress.toFixed(1);
-            ui.egressBar.style.width = Math.min((state.egress / 1000) * 100, 100) + "%";
-        }
+                    addLog({
+                        event: "brute_force",
+                        src_ip: CONFIG.extIps[1],
+                        target: "admin",
+                        count: 500
+                    }, "crit");
+                    triggerAttackVisual("BR", "BRUTE FORCE", "#ff3333");
+                    triggerAttackVisual("CN", "DDOS FLOOD", "#ff3333");
+                    setThreat(65, "ATTACK DETECTED");
+                    break;
+                case 4: // LATERAL
+                    state.defcon = 2;
+                    state.metrics.rps = 1200;
+                    addLog({
+                        event: "privilege_escalation",
+                        user: "svc_backup",
+                        command: "whoami /all",
+                        alert: "T1078"
+                    }, "crit");
+                    setThreat(80, "CRITICAL");
+                    updateAgent('agent-2', 'alert', 'Unusual Admin Access');
+                    break;
+                case 5: // EXFIL
+                    state.defcon = 1;
+                    state.metrics.net += 20; // Spike bandwidth
+                    // Major node loss (systems going dark)
+                    if (state.activeNodes > 600) state.activeNodes -= Math.floor(Math.random() * 10);
 
-        function calculateThreatScore() {
-            // Simple Logic for the Demo
-            if(state.phase === 0) state.threatScore = 10;
-            if(state.phase === 1) state.threatScore = 35;
-            if(state.phase === 2) state.threatScore = 60;
-            if(state.phase === 3) state.threatScore = 85;
-            if(state.phase === 4) state.threatScore = 98;
-            if(state.phase === 5) state.threatScore = 0;
+                    addLog({
+                        event: "data_exfil",
+                        dest_ip: CONFIG.extIps[2],
+                        bytes: 50000000,
+                        protocol: "DNS_TUNNEL"
+                    }, "crit");
+                    triggerAttackVisual("DE", "DATA EXFIL", "#bc13fe");
+                    setThreat(95, "DATA LOSS IMMINENT");
+                    updateAgent('agent-3', 'alert', 'DLP Triggered');
+                    break;
+                case 6: // DEFENSE
+                    state.defcon = 5;
+                    state.metrics.rps = 50;
+                    state.metrics.net = 0;
+                    // Recovery
+                    if (state.activeNodes < 1024) state.activeNodes += 5;
 
-            ui.threatScore.innerText = state.threatScore;
-
-            if(state.threatScore < 20) {
-                ui.threatScore.style.color = "#00ff41";
-                ui.threatLabel.innerText = "SECURE";
-                ui.threatLabel.style.color = "#00ff41";
-            } else if (state.threatScore < 60) {
-                ui.threatScore.style.color = "#ffaa00";
-                ui.threatLabel.innerText = "ELEVATED";
-                ui.threatLabel.style.color = "#ffaa00";
-            } else {
-                ui.threatScore.style.color = "#ff3333";
-                ui.threatLabel.innerText = "CRITICAL";
-                ui.threatLabel.style.color = "#ff3333";
-                ui.threatLabel.className = "blink";
+                    addLog({
+                        event: "soar_action",
+                        action: "block_ip",
+                        target: CONFIG.extIps[1],
+                        status: "success"
+                    }, "info");
+                    setThreat(10, "CONTAINED");
+                    updateAgent('agent-4', 'active', 'Threat Neutralized');
+                    break;
             }
         }
 
-        // --- AGENT CONTROL ---
-        function setAgent(id, status, msg) {
-            const el = document.getElementById(id);
-            const statusText = el.querySelector('.status');
-            
-            el.className = 'agent-card'; // reset
-            if (status === 'active') {
-                el.classList.add('agent-active');
-            } else if (status === 'alert') {
-                el.classList.add('agent-alert');
-            }
-            statusText.innerText = msg;
-        }
-
-        function addTimeline(msg) {
-            const li = document.createElement('li');
-            li.innerHTML = msg;
-            li.classList.add('timeline-highlight');
-            ui.timeline.appendChild(li);
-            ui.timeline.scrollTop = ui.timeline.scrollHeight;
-        }
-
-        // --- CAMPAIGN SCRIPT ---
-        async function startCampaign() {
-            if (state.isRunning) return;
-            state.isRunning = true;
+        // --- CONTROLS ---
+        function startCampaign() {
+            if (state.running) return;
+            state.running = true;
             document.getElementById('btn-start').disabled = true;
             document.getElementById('btn-reset').disabled = false;
 
-            // PHASE 1: RECON (2s)
-            addTimeline("Campaign Initiated: GTG-1002 Variant");
-            setTimeout(() => {
-                state.phase = 1;
-                setAgent('agent-5', 'alert', 'MCP Orchestration Detected');
-                addTimeline("Phase 1: Initial Access (MCP Signature)");
-            }, 2000);
+            logConsole("Initializing GTG-1002 Simulation...");
 
-            // PHASE 2: TEMPO (6s)
-            setTimeout(() => {
-                state.phase = 2;
-                setAgent('agent-1', 'alert', 'IMPOSSIBLE TEMPO (>4000 req/m)');
-                addTimeline("Phase 2: Tempo Anomaly (Humanly Impossible)");
-            }, 6000);
-
-            // PHASE 3: LATERAL (11s)
-            setTimeout(() => {
-                state.phase = 3;
-                setAgent('agent-4', 'alert', 'Privilege Escalation (ROOT)');
-                addTimeline("Phase 3: Lateral Movement to Finance DB");
-            }, 11000);
-
-            // PHASE 4: EXFIL (16s)
-            setTimeout(() => {
-                state.phase = 4;
-                setAgent('agent-3', 'active', 'Calculating Response...');
-                addTimeline("Phase 4: Exfiltration Started (DLP Trigger)");
-            }, 16000);
-
-            // PHASE 5: RESPONSE (20s)
-            setTimeout(() => {
-                state.phase = 5;
-                setAgent('agent-3', 'active', 'AUTOMATED BLOCK EXECUTED');
-                setAgent('agent-1', 'active', 'Normalizing...');
-                setAgent('agent-4', 'active', 'Session Killed');
-                setAgent('agent-5', 'active', 'Signature Banned');
-                addTimeline("Phase 5: THREAT NEUTRALIZED (Automated)");
-            }, 20000);
+            // Phase Timeline
+            setTimeout(() => { state.phase = 1; logConsole("[PHASE 1] RECONNAISSANCE DETECTED"); updateAgent('agent-3', 'active', 'Scanning Inbound'); }, 2000);
+            setTimeout(() => { state.phase = 2; logConsole("[PHASE 2] WEAPONIZATION / STAGING"); }, 6000);
+            setTimeout(() => { state.phase = 3; logConsole("[PHASE 3] DELIVERY & EXPLOIT (High Volume)"); updateAgent('agent-1', 'alert', 'Tempo Anomaly'); }, 10000);
+            setTimeout(() => { state.phase = 4; logConsole("[PHASE 4] LATERAL MOVEMENT"); }, 15000);
+            setTimeout(() => { state.phase = 5; logConsole("[PHASE 5] EXFILTRATION"); }, 20000);
+            setTimeout(() => { state.phase = 6; logConsole("[PHASE 6] AUTOMATED RESPONSE"); }, 25000);
         }
 
         function resetSim() {
             location.reload();
         }
 
-        // --- INIT ---
-        // Start background noise immediately
-        loopInterval = setInterval(runLoop, 400); // Run loop every 400ms
+        function setThreat(score, label) {
+            state.threat = score;
+            const el = document.getElementById('threat-val');
+            el.innerText = score;
+            document.getElementById('threat-lbl').innerText = label;
+
+            if (score > 80) {
+                el.style.color = "var(--accent-red)";
+                el.classList.add('glitch');
+            } else if (score > 50) {
+                el.style.color = "var(--accent-orange)";
+                el.classList.remove('glitch');
+            } else {
+                el.style.color = "var(--accent-green)";
+                el.classList.remove('glitch');
+            }
+        }
+
+        function updateAgent(id, status, msg) {
+            const el = document.getElementById(id);
+            el.className = `agent-item ${status}`;
+            el.querySelector('.agent-status').innerText = msg;
+            const dot = el.querySelector('.status-dot');
+            dot.style.background = status === 'alert' ? 'var(--accent-red)' : 'var(--accent-green)';
+        }
+
+        // Init
+        setInterval(runLoop, 200);
 
     </script>
 </body>
+
 </html>
