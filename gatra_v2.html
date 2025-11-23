@@ -116,10 +116,11 @@
         }
 
         /* --- GRID LAYOUT --- */
-        .dashboard-grid {
+        .grid-container {
             display: grid;
             grid-template-columns: 350px 1fr 300px;
-            grid-template-rows: 2fr 1fr;
+            grid-template-rows: auto 1fr 250px auto;
+            /* Added row for pipeline */
             gap: 10px;
             flex-grow: 1;
             height: calc(100vh - 80px);
@@ -155,7 +156,8 @@
         /* --- LOG FEED --- */
         #log-panel {
             grid-column: 1 / 2;
-            grid-row: 1 / 3;
+            grid-row: 2 / 4;
+            /* Adjusted row span */
         }
 
         #log-stream {
@@ -214,7 +216,8 @@
         /* --- MAP & VISUALIZATION --- */
         #map-panel {
             grid-column: 2 / 3;
-            grid-row: 1 / 2;
+            grid-row: 2 / 3;
+            /* Adjusted row */
             position: relative;
         }
 
@@ -226,21 +229,28 @@
 
         .map-overlay {
             position: absolute;
-            top: 10px;
+            top: 40px;
             left: 10px;
             pointer-events: none;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 5px 8px;
+            border: 1px solid #333;
+            border-radius: 2px;
+            backdrop-filter: blur(2px);
         }
 
         .overlay-stat {
             font-size: 10px;
-            color: var(--accent-green);
+            color: #aaa;
             margin-bottom: 2px;
+            font-family: 'Monaco', monospace;
         }
 
         /* --- METRICS --- */
         #metrics-panel {
             grid-column: 2 / 3;
-            grid-row: 2 / 3;
+            grid-row: 3 / 4;
+            /* Adjusted row */
             display: flex;
             flex-direction: row;
             gap: 1px;
@@ -283,7 +293,8 @@
         /* --- THREAT & AGENTS --- */
         #side-panel {
             grid-column: 3 / 4;
-            grid-row: 1 / 3;
+            grid-row: 2 / 4;
+            /* Adjusted row span */
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -377,6 +388,150 @@
             color: #555;
         }
 
+        /* --- PIPELINE --- */
+        .pipeline-container {
+            grid-column: 1 / -1;
+            /* Span all columns */
+            grid-row: 4 / 5;
+            /* Last row */
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: var(--panel-bg);
+            border: var(--border);
+            border-top: 2px solid var(--accent-blue);
+            padding: 10px 0;
+            margin-top: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        /* --- PIPELINE --- */
+        .pipeline-container {
+            grid-column: 1 / -1;
+            /* Span all columns */
+            grid-row: 4 / 5;
+            /* Last row */
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: var(--panel-bg);
+            border: var(--border);
+            border-top: 2px solid var(--accent-blue);
+            padding: 10px 0;
+            margin-top: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        .pipeline-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            color: var(--text-muted);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            flex: 1;
+        }
+
+        .pipeline-step.active .step-icon {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+
+        .pipeline-step.active .step-label {
+            color: var(--accent-green);
+        }
+
+        .step-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid #444;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .step-label {
+            transition: color 0.3s ease;
+        }
+
+        .pipeline-connector {
+            flex: 0 0 50px;
+            /* Fixed width for connector */
+            height: 2px;
+            background: #333;
+            position: relative;
+            margin: 0 -25px;
+            /* Overlap with steps */
+        }
+
+        .pipeline-connector.active {
+            background: var(--accent-green);
+            box-shadow: 0 0 5px var(--accent-green);
+        }
+
+        .pipeline-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            color: var(--text-muted);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            flex: 1;
+        }
+
+        .pipeline-step.active .step-icon {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+
+        .pipeline-step.active .step-label {
+            color: var(--accent-green);
+        }
+
+        .step-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid #444;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .step-label {
+            transition: color 0.3s ease;
+        }
+
+        .pipeline-connector {
+            flex: 0 0 50px;
+            /* Fixed width for connector */
+            height: 2px;
+            background: #333;
+            position: relative;
+            margin: 0 -25px;
+            /* Overlap with steps */
+        }
+
+        .pipeline-connector.active {
+            background: var(--accent-green);
+            box-shadow: 0 0 5px var(--accent-green);
+        }
+
         /* UTILS */
         .blink {
             animation: blinker 1s linear infinite;
@@ -448,11 +603,11 @@
         </div>
     </header>
 
-    <div class="dashboard-grid">
+    <div class="grid-container">
         <!-- LEFT: LOGS -->
         <div class="panel" id="log-panel">
             <div class="panel-header">
-                <span>INGESTION STREAM (ELASTIC)</span>
+                <span>INGESTION STREAM (SPLUNK)</span>
                 <span class="dots">:::</span>
             </div>
             <div id="log-stream"></div>
@@ -539,6 +694,39 @@
             <div class="side-module" style="flex-grow:1; display:flex; flex-direction:column;">
                 <div class="panel-header" style="padding:0; margin-bottom:5px; border:none;">SYSTEM CONSOLE</div>
                 <div id="console-output"></div>
+            </div>
+        </div>
+
+        <!-- BOTTOM: KILL CHAIN PIPELINE -->
+        <div class="pipeline-container">
+            <div class="pipeline-step" id="step-1">
+                <div class="step-icon">1</div>
+                <div class="step-label">RECON</div>
+            </div>
+            <div class="pipeline-connector" id="conn-1"></div>
+            <div class="pipeline-step" id="step-2">
+                <div class="step-icon">2</div>
+                <div class="step-label">WEAPON</div>
+            </div>
+            <div class="pipeline-connector" id="conn-2"></div>
+            <div class="pipeline-step" id="step-3">
+                <div class="step-icon">3</div>
+                <div class="step-label">DELIVERY</div>
+            </div>
+            <div class="pipeline-connector" id="conn-3"></div>
+            <div class="pipeline-step" id="step-4">
+                <div class="step-icon">4</div>
+                <div class="step-label">LATERAL</div>
+            </div>
+            <div class="pipeline-connector" id="conn-4"></div>
+            <div class="pipeline-step" id="step-5">
+                <div class="step-icon">5</div>
+                <div class="step-label">EXFIL</div>
+            </div>
+            <div class="pipeline-connector" id="conn-5"></div>
+            <div class="pipeline-step" id="step-6">
+                <div class="step-icon">6</div>
+                <div class="step-label">DEFENSE</div>
             </div>
         </div>
     </div>
@@ -639,121 +827,201 @@
             err: new LineChart(chartErr, '#ff3333', 100)
         };
 
-        // --- MAP LOGIC (DOT WORLD MAP) ---
-        // A simplified dot representation of continents
-        // 0=Empty, 1=NA, 2=SA, 3=EU, 4=AF, 5=AS, 6=OC
-        const worldGrid = [
-            "000000000000000000000000000000",
-            "000011100000000000000000000000",
-            "000111110000000000055555000000",
-            "000111110000003330055555550000",
-            "000011100000033333055555550000",
-            "000001000000003330005555500000",
-            "000000000000044440000555000000",
-            "000000222000004440000000660000",
-            "000000222200004440000006600000",
-            "000000022000000400000000000000",
-            "000000000000000000000000000000"
-        ];
+        // --- 3D GLOBE LOGIC ---
+        const GLOBE_RADIUS = 130;
+        let globeRotation = 0;
 
-        const nodes = [];
-        const countryMap = {
-            "US": { x: 0.2, y: 0.35, region: 1 },
-            "BR": { x: 0.28, y: 0.7, region: 2 },
-            "DE": { x: 0.48, y: 0.35, region: 3 },
-            "RU": { x: 0.65, y: 0.25, region: 5 },
-            "CN": { x: 0.75, y: 0.4, region: 5 },
-            "IN": { x: 0.68, y: 0.5, region: 5 },
-            "AU": { x: 0.85, y: 0.75, region: 6 },
-            "ZA": { x: 0.52, y: 0.8, region: 4 }
-        };
+        // 3D Projection Helper
+        function project3D(lat, lon, radius) {
+            const phi = (90 - lat) * (Math.PI / 180);
+            const theta = (lon + 180) * (Math.PI / 180);
 
-        // Parse grid to nodes
-        const rows = worldGrid.length;
-        const cols = worldGrid[0].length;
-        for (let r = 0; r < rows; r++) {
-            for (let c = 0; c < cols; c++) {
-                if (worldGrid[r][c] !== '0') {
-                    nodes.push({
-                        x: (c / cols) * 0.9 + 0.05, // Margin
-                        y: (r / rows) * 0.8 + 0.1,
-                        region: parseInt(worldGrid[r][c])
-                    });
-                }
-            }
+            const x = -(radius * Math.sin(phi) * Math.cos(theta));
+            const z = (radius * Math.sin(phi) * Math.sin(theta));
+            const y = (radius * Math.cos(phi));
+
+            // Rotate around Y axis
+            const rotX = x * Math.cos(globeRotation) - z * Math.sin(globeRotation);
+            const rotZ = x * Math.sin(globeRotation) + z * Math.cos(globeRotation);
+
+            // Perspective projection
+            const scale = 300 / (300 - rotZ);
+            const projX = rotX * scale + mapCanvas.width / 2;
+            const projY = y * scale + mapCanvas.height / 2;
+
+            return { x: projX, y: projY, z: rotZ, scale: scale, visible: rotZ < 0 };
         }
 
-        const hqNode = { x: 0.22, y: 0.38 }; // US East roughly
+        // Country Coordinates (Lat, Lon)
+        const countryCoords = {
+            "US": { lat: 37.09, lon: -95.71 },
+            "BR": { lat: -14.23, lon: -51.92 },
+            "DE": { lat: 51.16, lon: 10.45 },
+            "RU": { lat: 61.52, lon: 105.31 },
+            "CN": { lat: 35.86, lon: 104.19 },
+            "IN": { lat: 20.59, lon: 78.96 },
+            "AU": { lat: -25.27, lon: 133.77 },
+            "ZA": { lat: -30.55, lon: 22.93 },
+            "HQ": { lat: 38.90, lon: -77.03 } // Washington DC
+        };
+
+        // Generate Globe Dots (Fibonacci Sphere for even distribution)
+        const globeDots = [];
+        const numDots = 600;
+        const phi = Math.PI * (3 - Math.sqrt(5));
+
+        for (let i = 0; i < numDots; i++) {
+            const y = 1 - (i / (numDots - 1)) * 2;
+            const radius = Math.sqrt(1 - y * y);
+            const theta = phi * i;
+
+            const x = Math.cos(theta) * radius;
+            const z = Math.sin(theta) * radius;
+
+            // Convert back to lat/lon for reuse of projection logic
+            const lat = Math.asin(y) * (180 / Math.PI);
+            const lon = Math.atan2(z, x) * (180 / Math.PI);
+
+            globeDots.push({ lat, lon });
+        }
 
         function drawMap() {
             const w = mapCanvas.width;
             const h = mapCanvas.height;
             mapCtx.clearRect(0, 0, w, h);
 
-            // Draw World Dots
-            mapCtx.fillStyle = "#222";
-            nodes.forEach(n => {
-                mapCtx.beginPath();
-                mapCtx.arc(n.x * w, n.y * h, 2, 0, Math.PI * 2);
-                mapCtx.fill();
+            globeRotation += 0.005; // Auto-rotate
+
+            // 1. Atmosphere / Glow
+            const cx = w / 2;
+            const cy = h / 2;
+            const glow = mapCtx.createRadialGradient(cx, cy, GLOBE_RADIUS * 0.8, cx, cy, GLOBE_RADIUS * 1.5);
+            glow.addColorStop(0, "rgba(0, 255, 65, 0.05)");
+            glow.addColorStop(1, "transparent");
+            mapCtx.fillStyle = glow;
+            mapCtx.fillRect(0, 0, w, h);
+
+            // 2. Wireframe (Connect neighbors)
+            // We'll connect dots that are close to each other to form a mesh
+            // Optimization: Only connect a subset or use a fixed grid for wireframe if performance drops.
+            // For now, let's just draw the dots with better depth cues.
+
+            // Draw Globe Dots
+            globeDots.forEach(dot => {
+                const p = project3D(dot.lat, dot.lon, GLOBE_RADIUS);
+                if (p.visible) {
+                    // Depth Cue: Opacity and Size based on Z
+                    // p.z ranges roughly from 0 to GLOBE_RADIUS (for visible side)
+                    // Normalize z: 1 at front, 0.3 at horizon
+                    const depth = Math.max(0.2, 1 - (p.z / GLOBE_RADIUS));
+
+                    mapCtx.beginPath();
+                    mapCtx.fillStyle = `rgba(80, 80, 80, ${depth})`;
+                    mapCtx.arc(p.x, p.y, 1.5 * p.scale * depth, 0, Math.PI * 2);
+                    mapCtx.fill();
+                }
             });
 
-            // Draw HQ
-            mapCtx.fillStyle = "#00ff41";
-            mapCtx.beginPath();
-            mapCtx.arc(hqNode.x * w, hqNode.y * h, 4, 0, Math.PI * 2);
-            mapCtx.fill();
-            mapCtx.shadowBlur = 10;
-            mapCtx.shadowColor = "#00ff41";
-            mapCtx.stroke();
-            mapCtx.shadowBlur = 0;
+            // 3. Latitude / Longitude Lines (Graticule) for Structure
+            mapCtx.strokeStyle = "rgba(0, 255, 65, 0.05)";
+            mapCtx.lineWidth = 1;
 
-            // Draw Attacks
+            // Draw Longitudes (Meridians)
+            for (let lon = -180; lon < 180; lon += 30) {
+                mapCtx.beginPath();
+                let first = true;
+                for (let lat = -90; lat <= 90; lat += 5) {
+                    const p = project3D(lat, lon, GLOBE_RADIUS);
+                    if (p.visible) {
+                        if (first) { mapCtx.moveTo(p.x, p.y); first = false; }
+                        else mapCtx.lineTo(p.x, p.y);
+                    } else {
+                        first = true; // Break line if goes behind
+                    }
+                }
+                mapCtx.stroke();
+            }
+
+            // Draw Latitudes (Parallels)
+            for (let lat = -75; lat <= 75; lat += 30) {
+                mapCtx.beginPath();
+                let first = true;
+                for (let lon = -180; lon <= 180; lon += 5) {
+                    const p = project3D(lat, lon, GLOBE_RADIUS);
+                    if (p.visible) {
+                        if (first) { mapCtx.moveTo(p.x, p.y); first = false; }
+                        else mapCtx.lineTo(p.x, p.y);
+                    } else {
+                        first = true;
+                    }
+                }
+                mapCtx.stroke();
+            }
+
+            // Draw HQ
+            const hq = project3D(countryCoords.HQ.lat, countryCoords.HQ.lon, GLOBE_RADIUS);
+            if (hq.visible) {
+                mapCtx.fillStyle = "#00ff41";
+                mapCtx.beginPath();
+                mapCtx.arc(hq.x, hq.y, 3 * hq.scale, 0, Math.PI * 2);
+                mapCtx.fill();
+                mapCtx.shadowBlur = 10;
+                mapCtx.shadowColor = "#00ff41";
+                mapCtx.stroke();
+                mapCtx.shadowBlur = 0;
+            }
+
+            // Draw Attacks (3D Arcs)
             state.attacks = state.attacks.filter(a => a.life > 0);
             state.attacks.forEach(a => {
                 a.life--;
-                const sx = a.src.x * w;
-                const sy = a.src.y * h;
-                const dx = hqNode.x * w;
-                const dy = hqNode.y * h;
 
-                // Line
-                mapCtx.beginPath();
-                mapCtx.strokeStyle = a.color;
-                mapCtx.lineWidth = 1.5;
-                mapCtx.moveTo(sx, sy);
-                mapCtx.lineTo(dx, dy);
-                mapCtx.stroke();
+                const src = project3D(a.srcLat, a.srcLon, GLOBE_RADIUS);
+                const dst = project3D(countryCoords.HQ.lat, countryCoords.HQ.lon, GLOBE_RADIUS);
 
-                // Particle
-                const progress = 1 - (a.life / 40); // Slower animation
-                const px = sx + (dx - sx) * progress;
-                const py = sy + (dy - sy) * progress;
+                // Only draw if at least one point is visible or they are close
+                if (src.visible || dst.visible) {
+                    mapCtx.beginPath();
+                    mapCtx.strokeStyle = a.color;
+                    mapCtx.lineWidth = 1.5 * ((src.scale + dst.scale) / 2);
 
-                mapCtx.fillStyle = "#fff";
-                mapCtx.beginPath();
-                mapCtx.arc(px, py, 2, 0, Math.PI * 2);
-                mapCtx.fill();
+                    // Quadratic Bezier Control Point (flying high above surface)
+                    // Simple approximation: midpoint elevated
+                    const midX = (src.x + dst.x) / 2;
+                    const midY = (src.y + dst.y) / 2 - 50; // Arch height
 
-                // Label (Only at start)
-                if (a.life > 20) {
-                    mapCtx.fillStyle = a.color;
-                    mapCtx.font = "10px monospace";
-                    mapCtx.fillText(`[${a.country}] ${a.type}`, sx + 5, sy);
+                    mapCtx.moveTo(src.x, src.y);
+                    mapCtx.quadraticCurveTo(midX, midY, dst.x, dst.y);
+                    mapCtx.stroke();
+
+                    // Particle
+                    const t = 1 - (a.life / 40);
+                    const invT = 1 - t;
+                    const px = invT * invT * src.x + 2 * invT * t * midX + t * t * dst.x;
+                    const py = invT * invT * src.y + 2 * invT * t * midY + t * t * dst.y;
+
+                    mapCtx.fillStyle = "#fff";
+                    mapCtx.beginPath();
+                    mapCtx.arc(px, py, 2, 0, Math.PI * 2);
+                    mapCtx.fill();
+
+                    // Label
+                    if (a.life > 25 && src.visible) {
+                        mapCtx.fillStyle = a.color;
+                        mapCtx.font = "10px monospace";
+                        mapCtx.fillText(`[${a.country}] ${a.type}`, src.x + 5, src.y);
+                    }
                 }
             });
         }
 
         function triggerAttackVisual(country, type, color = "#ff3333") {
-            let src = countryMap[country];
-            if (!src) src = nodes[Math.floor(Math.random() * nodes.length)]; // Fallback
-
-            // Add slight jitter so lines don't perfectly overlap
-            const jitterX = (Math.random() - 0.5) * 0.02;
-            const jitterY = (Math.random() - 0.5) * 0.02;
+            let coords = countryCoords[country];
+            if (!coords) coords = countryCoords[Object.keys(countryCoords)[Math.floor(Math.random() * 8)]];
 
             state.attacks.push({
-                src: { x: src.x + jitterX, y: src.y + jitterY },
+                srcLat: coords.lat,
+                srcLon: coords.lon,
                 country: country,
                 type: type,
                 life: 40,
@@ -766,22 +1034,28 @@
             const el = document.createElement('div');
             el.className = `log-entry ${type}`;
 
-            // Format as pseudo-JSON
-            const ts = new Date().toISOString();
-            let jsonStr = `<span class="key">"@timestamp":</span> "<span class="str">${ts}</span>", `;
+            // Format as Splunk-style Key-Value Pairs
+            const d = new Date();
+            const ts = d.toISOString().replace('T', ' ').split('.')[0];
+
+            // Splunk Format: Time Event key=value key=value
+            let logStr = `<span class="log-time">${ts}</span> `;
 
             for (const [k, v] of Object.entries(entry)) {
-                let valHtml = typeof v === 'number' ? `<span class="num">${v}</span>` : `<span class="str">"${v}"</span>`;
-                jsonStr += `<span class="key">"${k}":</span> ${valHtml}, `;
+                let valStr = v;
+                // Quote strings if they contain spaces or are not numbers
+                if (typeof v === 'string') {
+                    valStr = `"<span class="str">${v}</span>"`;
+                } else {
+                    valStr = `<span class="num">${v}</span>`;
+                }
+                logStr += `<span class="key">${k}=</span>${valStr} `;
             }
 
-            // Truncate trailing comma
-            jsonStr = `{ ${jsonStr.slice(0, -2)} }`;
-
-            el.innerHTML = jsonStr;
+            el.innerHTML = logStr;
             const container = document.getElementById('log-stream');
             container.appendChild(el);
-            if (container.children.length > 15) container.removeChild(container.firstChild);
+            if (container.children.length > 20) container.removeChild(container.firstChild);
         }
 
         function logConsole(msg) {
@@ -844,6 +1118,22 @@
 
             // Random fluctuations
             state.metrics.rps += (Math.random() - 0.5);
+
+            // Update Pipeline UI
+            for (let i = 1; i <= 6; i++) {
+                const step = document.getElementById(`step-${i}`);
+                const conn = document.getElementById(`conn-${i - 1}`); // Connector before step
+
+                if (state.phase >= i) {
+                    step.classList.add('active');
+                    if (conn) conn.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                    // Don't remove connector active state immediately to keep the path lit
+                    // or remove it if we want strict phase indication. Let's keep it strict.
+                    if (conn) conn.classList.remove('active');
+                }
+            }
 
             switch (state.phase) {
                 case 1: // RECON
